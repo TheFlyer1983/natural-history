@@ -125,8 +125,6 @@ const sortedhighlights = computed(() => {
     if (date1 && date2) return date1 < date2 ? 1 : -1;
   })
 })
-
-
 </script>
 
 <template>
@@ -138,7 +136,7 @@ const sortedhighlights = computed(() => {
 
     <!-- Add the museum highlight cards based on the data provided below -->
     <div class="d-flex flex-wrap justify-content-between">
-      <MuseumHighlight v-for="highlight in sortedhighlights" :key="highlight.id" :highlight="highlight" :page="Routes.Space"/>
+      <MuseumHighlight v-for="highlight in sortedhighlights" :key="highlight.id" :highlight="highlight"/>
     </div>
   </div>
 </template>

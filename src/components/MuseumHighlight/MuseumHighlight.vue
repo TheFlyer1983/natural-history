@@ -4,11 +4,13 @@ import StarIcon from '@/assets/StarIcon.vue'
 import { Highlight } from '@/types'
 import { Routes } from '@/router/routes';
 import { format } from 'date-fns';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 
 // Typescript way of defining props in <script setup>: https://vuejs.org/api/sfc-script-setup.html#typescript-only-features
 const props = defineProps<{
-  highlight: Highlight,
-  page: string,
+  highlight: Highlight
 }>();
 
 const newsDate = computed(() => { 
@@ -17,10 +19,11 @@ const newsDate = computed(() => {
   }
 })
 
+// A computed property to understand what the current route is so that the correct badge can be displayed. Could maybe move this into a composable.
 const icon = computed(() => {
-  if (props.page === Routes.Space) {
+  if (route.name === Routes.Space) {
     return StarIcon;
-  } else if (props.page === Routes.Oceans) {
+  } else if (route.name === Routes.Oceans) {
     return;
   };
 })
@@ -37,30 +40,30 @@ const isExternal = computed(() => {
 </script>
 
 <template>
-    <div class="museum-highlight" :class="{ 'external': isExternal }"> <!-- The binding for the class here is to check the computed property and then apply a dynamic class regarding if this is from the main API or the Partner API-->
-        <!-- Display the available information for the highlight -->
-        <div class="museum-highlight__image">
-          <!-- Dynamic component to show highlight badge dependant on page -->
-          <!-- You could probably make this a slot, but I thought you would still need a separate component for each badge, so I used the Dynamic component -->
-          <component :is="icon" class="museum-highlight__image__badge"/>
-          <!-- Placeholder image for the card image-->
-          <img src="https://via.placeholder.com/400x200">
-        </div>
-        <div class="museum-highlight__name pb-3">
-          {{highlight.name}}
-        </div>
-        <div>
-          {{highlight.description || highlight.info}} <!-- Because the description is named info from the parter, then this is showing one or the other, depending on which one is available. This could also be done in a computed property.-->
-        </div>
-        <div v-if="extraData" class="pt-4">
-          {{ extraData }} <!-- It wasn't asked to display this, I'm just displaying it. It also wasn't asked to display the news attribute. -->
-        </div>
-        <div class="pt-4" v-if="highlight.news">
-          <p>Extra News</p>
-          <p>{{ highlight.news.title }}</p>
-          <p>{{ newsDate }}</p>
-        </div>
+  <div class="museum-highlight" :class="{ 'external': isExternal }"> <!-- The binding for the class here is to check the computed property and then apply a dynamic class regarding if this is from the main API or the Partner API-->
+    <!-- Display the available information for the highlight -->
+    <div class="museum-highlight__image">
+      <!-- Dynamic component to show highlight badge dependant on page -->
+      <!-- You could probably make this a slot, but I thought you would still need a separate component for each badge, so I used the Dynamic component -->
+      <component :is="icon" class="museum-highlight__image__badge"/>
+      <!-- Placeholder image for the card image-->
+      <img src="https://via.placeholder.com/400x200">
     </div>
+    <div class="museum-highlight__name pb-3">
+      {{highlight.name}}
+    </div>
+    <div>
+      {{highlight.description || highlight.info}} <!-- Because the description is named info from the parter, then this is showing one or the other, depending on which one is available. This could also be done in a computed property.-->
+    </div>
+    <div v-if="extraData" class="pt-4">
+      {{ extraData }} <!-- It wasn't asked to display this, I'm just displaying it. It also wasn't asked to display the news attribute. -->
+    </div>
+    <div class="pt-4" v-if="highlight.news">
+      <p>Extra News</p>
+      <p>{{ highlight.news.title }}</p>
+      <p>{{ newsDate }}</p>
+    </div>
+  </div>
 </template>
 
 
