@@ -62,6 +62,8 @@ import { computed, reactive } from 'vue'
 import MuseumHighlight from '@/components/MuseumHighlight/MuseumHighlight.vue';
 
 import { Routes } from '@/router/routes'
+import { concat } from 'lodash'
+import { Highlight } from '@/types';
 
 const spaceHighlights = reactive([
   {
@@ -111,10 +113,16 @@ const spacePartners = reactive({
   },
 })
 
+const mergedArray: Array<Highlight> = concat(spaceHighlights, spacePartners.observatory)
 
+//Sorting the array of highlights by most recent first.
 const sortedhighlights = computed(() => {
-  return spaceHighlights.sort((a, b) => {
-    return a.date > b.date ? 1 : -1;
+  //Sorting the merged array by date or created date. Not sure how to get rid of the typescript error that is showing.
+  return mergedArray.sort((a, b) => {
+    const date1 = a.date ? a.date : a.createdAt;
+    const date2 = b.date ? b.date : b.createdAt;
+
+    if (date1 && date2) return date1 < date2 ? 1 : -1;
   })
 })
 
@@ -131,8 +139,6 @@ const sortedhighlights = computed(() => {
     <!-- Add the museum highlight cards based on the data provided below -->
     <div class="d-flex flex-wrap justify-content-between">
       <MuseumHighlight v-for="highlight in sortedhighlights" :key="highlight.id" :highlight="highlight" :page="Routes.Space"/>
-
-      <MuseumHighlight v-for="highlight in spacePartners" :key="highlight.name" :highlight="highlight" :page="Routes.Space"/>
     </div>
   </div>
 </template>

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import StarIcon from '@/assets/StarIcon.vue'
 import { Highlight } from '@/types'
 import { Routes } from '@/router/routes';
+import { format } from 'date-fns';
 
 // Typescript way of defining props in <script setup>: https://vuejs.org/api/sfc-script-setup.html#typescript-only-features
 const props = defineProps<{
@@ -10,7 +11,11 @@ const props = defineProps<{
   page: string,
 }>();
 
-const newsDate = computed(() => props.highlight.news?.date) //Didn't know where to use this as it only appeared on one hightlight, but if it is there then this computed property will return that date.
+const newsDate = computed(() => { 
+  if (props.highlight.news?.date) {
+    return format(new Date(props.highlight.news.date), 'dd-MMMM-yyyy')
+  }
+})
 
 const icon = computed(() => {
   if (props.page === Routes.Space) {
@@ -20,6 +25,11 @@ const icon = computed(() => {
   };
 })
 
+const extraData = computed(() => {
+  if (props.highlight.quiz) return props.highlight.quiz;
+})
+
+//Checking to see if highlight is from an external partner source
 const isExternal = computed(() => {
   return !props.highlight.date ? true : false
 })
@@ -31,6 +41,7 @@ const isExternal = computed(() => {
         <!-- Display the available information for the highlight -->
         <div class="museum-highlight__image">
           <!-- Dynamic component to show highlight badge dependant on page -->
+          <!-- You could probably make this a slot, but I thought you would still need a separate component for each badge, so I used the Dynamic component -->
           <component :is="icon" class="museum-highlight__image__badge"/>
           <!-- Placeholder image for the card image-->
           <img src="https://via.placeholder.com/400x200">
@@ -40,6 +51,14 @@ const isExternal = computed(() => {
         </div>
         <div>
           {{highlight.description || highlight.info}} <!-- Because the description is named info from the parter, then this is showing one or the other, depending on which one is available. This could also be done in a computed property.-->
+        </div>
+        <div v-if="extraData" class="pt-4">
+          {{ extraData }} <!-- It wasn't asked to display this, I'm just displaying it. It also wasn't asked to display the news attribute. -->
+        </div>
+        <div class="pt-4" v-if="highlight.news">
+          <p>Extra News</p>
+          <p>{{ highlight.news.title }}</p>
+          <p>{{ newsDate }}</p>
         </div>
     </div>
 </template>
